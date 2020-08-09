@@ -1,0 +1,4 @@
+.clang-format
+code.cpp
+compile_flags.txt
+test.cpp
