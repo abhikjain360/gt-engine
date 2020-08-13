@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <type_traits>
 
 // used internally, inside vertex to point to other vertices
@@ -17,7 +18,7 @@ public:
     vertex(size_t capacity = 2, size_t weight = 1)
         : _Deg(0),
           _Wgt(weight),
-          _Cap(capacity),
+          _Cap(capacity > 1 ? capacity : 2),
           _Edges(std::make_unique<joiner[]>(capacity)) {}
 
     // UNTESTED
@@ -44,7 +45,12 @@ public:
         // if no cache left, means degree = last index filled + 1
         //                                = index to be filled now
 
+		// vertex list to handle the vertex on the
+		// other side of the edge
+
         // do this if capacity id not enough
+		// note that degree == capacity only if
+		// no del_cache is left
         if (_Deg == _Cap) {
             size_t lt = 2;
             while (lt <= _Cap) lt <<= 1;
@@ -72,32 +78,33 @@ public:
     */
     // UNTESTED
     bool unjoin(size_t dest) {
-		if (_del_Deg == _del_Cap) {
-			size_t lt = 2;
-			while (lt < _del_Deg) lt <<= 1;
+        if (_del_Deg == _del_Cap) {
+            size_t lt = 2;
+            while (lt < _del_Deg) lt <<= 1;
 
-			this->resize_del_cache(lt);
-			_del_Cap = lt;
-		}
+            this->resize_del_cache(lt);
+            _del_Cap = lt;
+        }
 
-		bool deleted = false;
 
-		// TODO: handle for cases when cache already there;
-		// 		 indexing if _Edges would not be same as _Deg
-		for (size_t i = 0; i < _Deg; ++i) {
-			if (_Edges[i].dest == dest) {
-				_Edges[i] = {0, 0};
-				_del_Cache[_del_Deg++] = i;
-			}
-		}
+        // TODO: handle for cases when cache already there;
+        // 		 indexing if _Edges would not be same as _Deg
+        for (size_t i = 0; i < _Cap; ++i) {
+            if (_Edges[i].dest == dest) {
+                _Edges[i]              = {0, 0};
+                _del_Cache[_del_Deg++] = i;
+				--_Deg;
+				return true;
+            }
+        }
 
-		return deleted;
+		return false;
     }
 
-	// TODO: functions to add:
-	// 		 1) get number of connections to a certain vertex
-	// 		 2) make all connections unique (use sets)
-	// 		 3) unjoin all connections with a certain vertex
+    // TODO: functions to add:
+    // 		 1) get number of connections to a certain vertex
+    // 		 2) make all connections unique (use sets)
+    // 		 3) unjoin all connections with a certain vertex
 
 private:
     size_t _Deg, _Wgt, _Cap;
