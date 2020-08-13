@@ -45,12 +45,12 @@ public:
         // if no cache left, means degree = last index filled + 1
         //                                = index to be filled now
 
-		// vertex list to handle the vertex on the
-		// other side of the edge
+        // vertex list to handle the vertex on the
+        // other side of the edge
 
         // do this if capacity id not enough
-		// note that degree == capacity only if
-		// no del_cache is left
+        // note that degree == capacity only if
+        // no del_cache is left
         if (_Deg == _Cap) {
             size_t lt = 2;
             while (lt <= _Cap) lt <<= 1;
@@ -86,19 +86,18 @@ public:
             _del_Cap = lt;
         }
 
-
         // TODO: handle for cases when cache already there;
         // 		 indexing if _Edges would not be same as _Deg
         for (size_t i = 0; i < _Cap; ++i) {
             if (_Edges[i].dest == dest) {
                 _Edges[i]              = {0, 0};
                 _del_Cache[_del_Deg++] = i;
-				--_Deg;
-				return true;
+                --_Deg;
+                return true;
             }
         }
 
-		return false;
+        return false;
     }
 
     // TODO: functions to add:
@@ -107,8 +106,13 @@ public:
     // 		 3) unjoin all connections with a certain vertex
 
 private:
+	// the very basics needed
     size_t _Deg, _Wgt, _Cap;
     std::unique_ptr<joiner[]> _Edges;
+
+	// del degree will always point at last valid index + 1
+	// del cache stores only the 0 based indices
+	// of free edges storage
     size_t _del_Deg = 0, _del_Cap;
     std::unique_ptr<size_t[]> _del_Cache; // stores indices
 
