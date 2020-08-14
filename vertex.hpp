@@ -132,9 +132,38 @@ public:
         return false;
     }
 
+    // moving if rvalue provided
+    vertex& operator=(vertex&& v) {
+        _id  = v._id;
+        _deg = v._deg;
+        _cap = v._cap;
+        _wgt = v._wgt;
+        _E   = std::move(v._E);
+
+        _d_deg = v._d_deg;
+        _d_cap = v._d_cap;
+        _D     = std::move(v._D);
+
+        return *this;
+    }
+
+    vertex& operator=(const vertex& v) {
+        _id  = v._id;
+        _deg = v._deg;
+        _cap = v._cap;
+        _wgt = v._wgt;
+        for (size_t i = 0; i < _cap; ++i) _E[i] = v._E[i];
+
+        _d_deg = v._d_deg;
+        _d_cap = v._d_cap;
+        for (size_t i = 0; i < _d_cap; ++i) _D[i] = v._D[i];
+
+        return *this;
+    }
+
     // TODO: functions to add:
-    // 		 2) make all connections unique (use sets)
-    // 		 3) unjoin all connections with a certain vertex
+    // 		 1) make all connections unique (use sets)
+    // 		 2) unjoin all connections
 
 private:
     // the very basics needed
@@ -145,11 +174,11 @@ private:
     // del degree will always point at last valid index + 1
     // del cache stores only the 0 based indices
     // of free edges storage
-    size_t _d_deg = 0, _d_cap;
+    size_t _d_deg, _d_cap;
     std::unique_ptr<size_t[]> _D; // stores indices
 
     /* Resize */
-    bool resize(size_t size) {
+    bool resize(const size_t size) {
         // resize should not delete existing info
         if (size <= _deg) return false;
 
@@ -169,7 +198,7 @@ private:
         return true;
     }
 
-    bool resize_d(size_t size) {
+    bool resize_d(const size_t size) {
         // resize should not delete existing info
         if (size <= _d_deg) return false;
 
