@@ -7,41 +7,55 @@
 
 // used internally, inside vertex to point to other vertices
 struct joiner {
-    float weight;
     size_t dest;
+    float weight;
 };
 
+// aim: to make sure vertex_list needs no direct access to
+// 		the member variables of the vertex class
+// preferably access the degree and capacity once in start
+// and let it handle the rest automatically
 class vertex {
 public:
-    /* Construtors */
-    // UNTESTED
-    vertex(size_t capacity = 2, size_t weight = 1)
+    /* Constructors */
+	vertex()
         : _Deg(0),
-          _Wgt(weight),
-          _Cap(capacity > 1 ? capacity : 2),
-          _Edges(std::make_unique<joiner[]>(capacity)) {}
+          _Cap(2),
+          _Wgt(1),
+          _Edges(std::make_unique<joiner[]>(_Cap)),
+          _del_Deg(0),
+          _del_Cap(_Cap),
+          _del_Cache(std::make_unique<size_t[]>(_Cap)) {}
 
-    // UNTESTED
-    vertex(std::unique_ptr<joiner[]> joiner_list, size_t size,
-           size_t weight = 1)
-        : _Deg(size),
+    vertex(float weight, size_t capacity = 2)
+        : _Deg(0),
+          _Cap(capacity > 1 ? capacity : 2),
           _Wgt(weight),
-          _Cap(size),
-          _Edges(std::move(joiner_list)) {}
+          _Edges(std::make_unique<joiner[]>(_Cap)),
+          _del_Deg(0),
+          _del_Cap(_Cap),
+          _del_Cache(std::make_unique<size_t[]>(_Cap)) {}
+
+    vertex(std::unique_ptr<joiner[]> joiner_list, size_t size,
+           float weight = 1)
+        : _Deg(size),
+          _Cap(size > 1 ? size : 2),
+          _Wgt(weight),
+          _Edges(std::move(joiner_list)),
+		  _del_Deg(0),
+          _del_Cap(_Cap),
+          _del_Cache(std::make_unique<size_t[]>(_Cap)) {}
 
     /* Setters */
-    // UNTESTED, but should work fine
-    void set_weight(size_t weight) noexcept { this->_Wgt = weight; }
+    void set_weight(float weight) noexcept { this->_Wgt = weight; }
 
     /* Getters */
-    // UNTESTED, but should work fine
-    size_t weight() const noexcept { return _Wgt; }
+    float weight() const noexcept { return _Wgt; }
     size_t capacity() const noexcept { return _Cap; }
     size_t degree() const noexcept { return _Deg; }
 
     /* Add edges */
-    // UNTESTED
-    void join(size_t dest, float weight) {
+    void join(size_t dest, float weight = 1) {
         // if no cache left, means degree = last index filled + 1
         //                                = index to be filled now
 
@@ -56,28 +70,31 @@ public:
             while (lt <= _Cap) lt <<= 1;
             this->resize(lt);
 
-            _Edges[_Deg++] = {weight, dest};
+            _Edges[_Deg++] = {dest, weight};
             return;
         }
 
         // do this if we have some cache
         // degree < capacity if cache left
         if (_del_Deg > 0) {
-            _Edges[_del_Cache[--_del_Deg]] = {weight, dest};
+            _Edges[_del_Cache[--_del_Deg]] = {dest, weight};
             ++_Deg;
             return;
         }
 
         // capacity enough, no cache
-        _Edges[_Deg++] = {weight, dest};
+        _Edges[_Deg++] = {dest, weight};
     }
 
     /* Remove edges :
        returns false if no such vertex existed,
            else returns true if it does and is deleted
     */
-    // UNTESTED
     bool unjoin(size_t dest) {
+        // even if last element deleted and added to del cache,
+        // no problem
+
+        // increas del cache x2 if not enough
         if (_del_Deg == _del_Cap) {
             size_t lt = 2;
             while (lt < _del_Deg) lt <<= 1;
@@ -87,7 +104,8 @@ public:
         }
 
         // TODO: handle for cases when cache already there;
-        // 		 indexing if _Edges would not be same as _Deg
+        // 		 1. indexing if _Edges would not be same as _Deg
+        // 		 2. optimize if deleting from last
         for (size_t i = 0; i < _Cap; ++i) {
             if (_Edges[i].dest == dest) {
                 _Edges[i]              = {0, 0};
@@ -101,23 +119,22 @@ public:
     }
 
     // TODO: functions to add:
-    // 		 1) get number of connections to a certain vertex
     // 		 2) make all connections unique (use sets)
     // 		 3) unjoin all connections with a certain vertex
 
 private:
-	// the very basics needed
-    size_t _Deg, _Wgt, _Cap;
+    // the very basics needed
+    size_t _Deg, _Cap;
+	float _Wgt;
     std::unique_ptr<joiner[]> _Edges;
 
-	// del degree will always point at last valid index + 1
-	// del cache stores only the 0 based indices
-	// of free edges storage
+    // del degree will always point at last valid index + 1
+    // del cache stores only the 0 based indices
+    // of free edges storage
     size_t _del_Deg = 0, _del_Cap;
     std::unique_ptr<size_t[]> _del_Cache; // stores indices
 
     /* Resize */
-    // UNTESTED
     bool resize(size_t size) {
         // resize should not delete existing info
         if (size <= _Deg) return false;
@@ -138,7 +155,6 @@ private:
         return true;
     }
 
-    // UNTESTED
     bool resize_del_cache(size_t size) {
         // resize should not delete existing info
         if (size <= _del_Deg) return false;

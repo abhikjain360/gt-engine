@@ -9,3 +9,5 @@ struct edge {
 
 
 // Note: vertex indexing starts at 1
+// vertex_list handles adding info about edge on both vertices
+// vertex_list also to handle edge struct operations
