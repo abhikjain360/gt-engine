@@ -7,10 +7,12 @@
 
 #include "edge.hpp"
 
-// aim: to make sure vertex_list needs no direct access to
-// 		the member variables of the vertex class
-// preferably access the degree and capacity once in start
-// and let it handle the rest automatically
+// TODO: vertices don't store info about direction of edges, make them do so.
+// Also, make seperate cpp files for implementation
+
+// aim: to make sure vertex_list needs no direct access to the member variables
+// of the vertex class. Preferably define the degree and capacity once in start
+// and let the class handle them automatically in later operations
 class vertex {
 public:
     /* Constructors */
@@ -178,9 +180,10 @@ private:
     std::unique_ptr<size_t[]> _D; // stores indices
 
     /* Resize */
+	// resize only affects the capacity, not the degree
     bool resize(const size_t size) {
         // resize should not delete existing info
-        if (size <= _deg) return false;
+        if (size <= _cap) return false;
 
         // reallocation most thread safe
         auto temp = std::make_unique<joiner[]>(size);
@@ -198,9 +201,10 @@ private:
         return true;
     }
 
+	// resize only affects the capacity, not the degree
     bool resize_d(const size_t size) {
         // resize should not delete existing info
-        if (size <= _d_deg) return false;
+        if (size <= _d_cap) return false;
 
         // reallocation most thread safe
         auto del_temp = std::make_unique<size_t[]>(size);
