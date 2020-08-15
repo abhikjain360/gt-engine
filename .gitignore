@@ -1,6 +1,8 @@
 .clang-format
 code.cpp
-compile_flags.txt
-test.cpp
-Makefile
 code
+compile_flags.txt
+linked-list
+Makefile
+test.cpp
+vertex.hpp
