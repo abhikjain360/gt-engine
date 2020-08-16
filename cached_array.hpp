@@ -1,14 +1,14 @@
 #pragma once
 
 #include <cstddef>
-#include <memory>
 #include <functional>
+#include <memory>
 
 template <typename T>
 class cached_array {
 public:
     constexpr cached_array() noexcept
-        : _deg(1),
+        : _deg(0),
           _cap(2),
           _ptr(std::make_unique<T[]>(2)),
           _d_deg(0),
@@ -51,7 +51,16 @@ public:
         _ptr[_deg++] = t;
     }
 
-    bool remove(const T& t, std::function<bool(const T&, const T&)> compare) {
+    void add(std::unique_ptr<T>&& p, size_t size) {
+        size_t lt = _deg + size - _d_deg;
+        if (lt >= _cap) this->resize(lt);
+
+        while (_d_deg > 0) {
+        }
+    }
+
+    template <typename Compare>
+    bool remove(const T& t, Compare compare) {
         // even if last element deleted and added to del cache,
         // no problem
 
@@ -64,7 +73,7 @@ public:
         // 		 1. indexing if _Edges would not be same as _Deg
         // 		 2. optimize if deleting from last
         for (size_t i = 0; i < _cap; ++i) {
-            if (_d_ptr[i] == t) {
+            if (compare(_d_ptr[i], t)) {
                 _d_ptr[i]        = (T)0;
                 _d_ptr[_d_deg++] = i;
                 --_deg;
@@ -73,6 +82,37 @@ public:
         }
 
         return false;
+    }
+
+    cached_array<T>& operator=(cached_array<T>&& arr) {
+        // setting values of the LHS
+        _deg = arr._deg;
+        _cap = arr._cap;
+        _ptr = std::move(arr._ptr);
+
+        _d_deg = arr._d_deg;
+        _d_cap = arr._d_cap;
+        _d_ptr = std::move(arr._d_ptr);
+
+        // removing values of the RHS
+        arr._deg   = 0;
+        arr._cap   = 0;
+        arr._d_deg = 0;
+        arr._d_cap = 0;
+
+        return *this;
+    }
+
+    cached_array<T>& operator=(const cached_array<T>& arr) {
+        _deg = arr._deg;
+        _cap = arr._cap;
+        for (size_t i = 0; i < _cap; ++i) _ptr[i] = arr._ptr[i];
+
+        _d_deg = arr._d_deg;
+        _d_cap = arr._d_cap;
+        for (size_t i = 0; i < _d_cap; ++i) _d_ptr[i] = arr._d_ptr[i];
+
+        return *this;
     }
 
     constexpr size_t degree() const noexcept { return _deg; }
