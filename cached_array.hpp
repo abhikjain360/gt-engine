@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <functional>
 #include <memory>
 
 template <typename T>
@@ -166,8 +165,7 @@ private:
         // reallocation most thread safe
         auto temp = std::make_unique<size_t[]>(lt);
 
-        if constexpr (std::is_nothrow_move_assignable_v<
-                          std::unique_ptr<size_t[]>>) {
+        if constexpr (std::is_nothrow_move_assignable_v<std::unique_ptr<size_t[]>>) {
             std::move(_d_ptr.get(), _d_ptr.get() + _d_cap, temp.get());
         } else {
             std::copy(_d_ptr.get(), _d_ptr.get() + _d_cap, temp.get());
