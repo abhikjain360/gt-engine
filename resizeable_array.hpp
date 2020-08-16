@@ -7,36 +7,52 @@ template <typename T>
 class resizeable_array {
 public:
     constexpr resizeable_array() noexcept
-        : _deg(0), _cap(2), _ptr(std::make_unique<T[]>(2)) {}
+        : deg(0), cap(2), ptr(std::make_unique<T[]>(2)) {}
 
     constexpr resizeable_array(const size_t capacity) noexcept
-        : _deg(0), _cap(capacity), _ptr(std::make_unique<T[]>(capacity)) {}
+        : deg(0), cap(capacity), ptr(std::make_unique<T[]>(capacity)) {}
 
     resizeable_array(std::unique_ptr<T> p, const size_t size)
-        : _deg(size), _cap(next2(size)), _ptr(std::move(p)) {}
+        : deg(size), cap(next2(size)), ptr(std::move(p)) {}
 
-    constexpr size_t degree() const noexcept { return _deg; }
-    constexpr size_t capacity() const noexcept { return _cap; }
+    constexpr size_t degree() const noexcept { return deg; }
+    constexpr size_t capacity() const noexcept { return cap; }
 
-    void set_degree(const size_t degree) noexcept { _deg = degree; }
+    void set_degree(const size_t degree) noexcept { deg = degree; }
 
     void put(const size_t index, const T& t) {
-        if (index >= _cap) this->resize(index + 1);
-        _ptr[index] = t;
-        ++_deg;
+        if (index >= cap) this->resize(index + 1);
+        ptr[index] = t;
+        ++deg;
     }
 
     void remove(const size_t index, const T& t = 0) {
-        if (index >= _cap) return;
-        _ptr[index] = t;
-        --_deg;
+        if (index >= cap) return;
+        ptr[index] = t;
+        --deg;
     }
 
-    T operator[](const size_t index) { return _ptr[index]; }
+    T& pop() { return ptr[deg--]; }
+    void push(const T& t) { ptr[deg++] = t; }
+
+    const T& operator[](const size_t index) const { return ptr[index]; }
+
+    resizeable_array<T>& operator=(resizeable_array<T>&& arr) {
+        // setting values of the LHS
+        deg = arr.deg;
+        cap = arr.cap;
+        ptr = std::move(arr._ptr);
+    }
+
+    resizeable_array<T>& operator=(const resizeable_array<T>& arr) {
+        deg = arr.deg;
+        cap = arr.cap;
+        for (size_t i = 0; i < cap; ++i) ptr[i] = arr.ptr[i];
+    }
 
 private:
-    size_t _deg, _cap;
-    std::unique_ptr<T[]> _ptr;
+    size_t deg, cap;
+    std::unique_ptr<T[]> ptr;
 
     // utility functon
     constexpr size_t next2(size_t size) const noexcept {
@@ -56,7 +72,7 @@ private:
     // next power of 2
     bool resize(const size_t size) {
         // resize should not delete existing info
-        if (size <= _cap) return false;
+        if (size <= cap) return false;
 
         size_t lt = next2(size);
 
@@ -68,13 +84,13 @@ private:
         auto temp = std::make_unique<T[]>(size);
 
         if constexpr (std::is_nothrow_move_assignable_v<std::unique_ptr<T[]>>) {
-            std::move(_ptr.get(), _ptr.get() + _cap, temp.get());
+            std::move(ptr.get(), ptr.get() + cap, temp.get());
         } else {
-            std::copy(_ptr.get(), _ptr.get() + _cap, temp.get());
+            std::copy(ptr.get(), ptr.get() + cap, temp.get());
         }
 
-        _ptr = std::move(temp);
-        _cap = size;
+        ptr = std::move(temp);
+        cap = size;
 
         return;
     }
