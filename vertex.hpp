@@ -29,10 +29,11 @@ public:
     constexpr void set_weight(const float weight) { wgt = weight; }
     constexpr void set_id(const size_t id) { m_id = id; }
 
-    void join(const size_t dest, const float weight) { edges.add({dest, weight}); }
+    void join(const size_t dest, const float weight = 1) { edges.add({dest, weight}); }
     void unjoin(const size_t dest) {
-        edges.remove<size_t>(
-            dest, [](const joiner& a, const joiner& b) { return a.dest == b.dest; });
+        edges.remove<size_t>(dest, [](const joiner& edge, const size_t& dest) {
+            return dest == edge.dest;
+        });
     }
 
     vertex& operator=(vertex&& v) {
