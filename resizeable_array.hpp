@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <cstddef>
 #include <memory>
 #include <optional>
@@ -12,11 +13,15 @@ public:
         : deg(0), cap(2), ptr(std::make_unique<T[]>(2)) {}
 
     constexpr resizeable_array(const size_t capacity) noexcept
-        : deg(0), cap(capacity), ptr(std::make_unique<T[]>(cap)) {}
+        : deg(0), cap(capacity), ptr(std::make_unique<T[]>(cap)) {
+        assert(capacity > 0);
+    }
 
     // UNTESTED
     resizeable_array(std::unique_ptr<T[]> p, const size_t size)
-        : deg(size), cap(size), ptr(std::move(p)) {}
+        : deg(size), cap(size), ptr(std::move(p)) {
+        assert(ptr != nullptr);
+    }
 
     /* Getters */
     constexpr size_t degree() const noexcept { return deg; }
@@ -30,7 +35,7 @@ public:
     }
 
     void remove(const size_t index, const T& t = 0) {
-        if (index >= cap || deg <= 0) return;
+        assert(index < cap);
         ptr[index] = t;
         --deg;
     }

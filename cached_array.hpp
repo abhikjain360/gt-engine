@@ -15,7 +15,9 @@ public:
     /* Constructors */
     constexpr cached_array() noexcept : ptr(), d_ptr(){};
     cached_array(std::unique_ptr<T[]> p, const size_t size) noexcept
-        : ptr(std::move(p), size), d_ptr(size){};
+        : ptr(std::move(p), size), d_ptr(size) {
+        assert(ptr != nullptr);
+    }
 
     /* Getters */
     constexpr size_t degree() const noexcept { return ptr.degree(); }
@@ -51,6 +53,11 @@ public:
                 d_ptr.push(i);
             }
         }
+    }
+
+    constexpr const T& operator[](const size_t index) const noexcept {
+        assert(index < ptr.degree());
+        return ptr[index];
     }
 
     /* for assignments */
