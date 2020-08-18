@@ -12,11 +12,11 @@ public:
         : deg(0), cap(2), ptr(std::make_unique<T[]>(2)) {}
 
     constexpr resizeable_array(const size_t capacity) noexcept
-        : deg(0), cap(next2(capacity)), ptr(std::make_unique<T[]>(next2(capacity))) {}
+        : deg(0), cap(capacity), ptr(std::make_unique<T[]>(cap)) {}
 
     // UNTESTED
-    resizeable_array(std::unique_ptr<T> p, const size_t size)
-        : deg(size), cap(next2(size)), ptr(std::move(p)) {}
+    resizeable_array(std::unique_ptr<T[]> p, const size_t size)
+        : deg(size), cap(size), ptr(std::move(p)) {}
 
     /* Getters */
     constexpr size_t degree() const noexcept { return deg; }
@@ -39,7 +39,10 @@ public:
         if (deg > 0) return ptr[--deg];
         return {};
     }
-    void push(const T& t) { ptr[deg++] = t; }
+    void push(const T& t) {
+        if (deg >= cap) this->resize(cap + 1);
+        ptr[deg++] = t;
+    }
 
     const T& operator[](const size_t index) const { return ptr[index]; }
 
@@ -48,13 +51,17 @@ public:
         // setting values of the LHS
         deg = arr.deg;
         cap = arr.cap;
-        ptr = std::move(arr._ptr);
+        ptr = std::move(arr.ptr);
+
+        return *this;
     }
 
     resizeable_array<T>& operator=(const resizeable_array<T>& arr) {
         deg = arr.deg;
         cap = arr.cap;
         for (size_t i = 0; i < cap; ++i) ptr[i] = arr.ptr[i];
+
+        return *this;
     }
 
 private:

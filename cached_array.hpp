@@ -14,7 +14,7 @@ class cached_array {
 public:
     /* Constructors */
     constexpr cached_array() noexcept : ptr(), d_ptr(){};
-    constexpr cached_array(std::unique_ptr<T[]> p, const size_t size) noexcept
+    cached_array(std::unique_ptr<T[]> p, const size_t size) noexcept
         : ptr(std::move(p), size), d_ptr(size){};
 
     /* Getters */
@@ -41,6 +41,18 @@ public:
         }
     }
 
+    template <typename S = T, typename Compare = bool(const T&, const S&)>
+    void remove(
+        const S& s,
+        Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+        for (size_t i = 0; i < ptr.capacity(); ++i) {
+            if (compare(ptr[i], s)) {
+                ptr.remove(i);
+                d_ptr.push(i);
+            }
+        }
+    }
+
     /* for assignments */
     cached_array<T>& operator=(cached_array<T>&& arr) {
         ptr   = std::move(arr.ptr);
@@ -52,6 +64,8 @@ public:
     cached_array<T>& operator=(const cached_array<T>& arr) {
         ptr   = arr.ptr;
         d_ptr = arr.d_ptr;
+
+        return *this;
     }
 
 private:
