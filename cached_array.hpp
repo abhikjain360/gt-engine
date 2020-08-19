@@ -14,9 +14,22 @@ class cached_array {
 public:
     /* Constructors */
     constexpr cached_array() noexcept : ptr(), d_ptr(){};
+
     cached_array(std::unique_ptr<T[]> p, const size_t size) noexcept
         : ptr(std::move(p), size), d_ptr(size) {
         assert(ptr != nullptr);
+    }
+
+    /* Copy Contuctor */
+    cached_array(cached_array<T>& arr)
+        : ptr(std::move(arr.ptr)), d_ptr(std::move(arr.d_ptr)) {
+        assert(ptr != nullptr && d_ptr != nullptr);
+    }
+
+    /* Move Contuctor */
+    cached_array(cached_array<T>&& arr)
+        : ptr(std::move(arr.ptr)), d_ptr(std::move(arr.d_ptr)) {
+        assert(ptr != nullptr && d_ptr != nullptr);
     }
 
     /* Getters */
@@ -55,7 +68,12 @@ public:
         }
     }
 
-    constexpr const T& operator[](const size_t index) const noexcept {
+    T& operator[](const size_t index) noexcept {
+        assert(index < ptr.degree());
+        return ptr[index];
+    }
+
+    const T& operator[](const size_t index) const noexcept {
         assert(index < ptr.degree());
         return ptr[index];
     }

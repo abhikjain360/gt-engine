@@ -69,6 +69,12 @@ public:
         return *this;
     }
 
+    bool operator==(const resizeable_array<T>& arr) { return arr.ptr.get() == ptr.get(); }
+    bool operator==(const T* p) { return p == ptr.get(); }
+
+    bool operator!=(const resizeable_array<T>& arr) { return arr.ptr.get() != ptr.get(); }
+    bool operator!=(const T* p) { return p != ptr.get(); }
+
 private:
     size_t deg, cap;
     std::unique_ptr<T[]> ptr;

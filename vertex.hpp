@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <type_traits>
+#include <utility>
 
 #include "cached_array.hpp"
 #include "edge.hpp"
@@ -18,6 +19,10 @@ public:
     vertex(const size_t id, std::unique_ptr<joiner[]> ptr, const size_t size,
            const float weight = 1)
         : m_id(id), wgt(weight), edges(std::move(ptr), size) {}
+
+    /* Copy Contuctor */
+    vertex(vertex& v) : m_id(v.m_id), wgt(v.wgt), edges(v.edges) {}
+    vertex(vertex&& v) : m_id(v.m_id), wgt(v.wgt), edges(std::move(v.edges)) {}
 
     /* Getters */
     constexpr size_t id() const noexcept { return m_id; }
