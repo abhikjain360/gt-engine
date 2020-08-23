@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <memory>
@@ -74,6 +75,11 @@ public:
 
     bool operator!=(const resizeable_array<T>& arr) { return arr.ptr.get() != ptr.get(); }
     bool operator!=(const T* p) { return p != ptr.get(); }
+
+    template <typename Compare = bool(const T&, const T&)>
+    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+        std::sort(ptr.get(), ptr.get() + cap, compare);
+    }
 
 private:
     size_t deg, cap;

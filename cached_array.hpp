@@ -93,6 +93,15 @@ public:
         return *this;
     }
 
+    /* sort */
+    template <typename Compare = bool(const T&, const T&)>
+    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+        ptr.sort(compare);
+        for (size_t i = 0; i < d_ptr.capacity(); ++i) {
+            d_ptr.remove(i);
+        }
+    }
+
 private:
     _ptr_t<T> ptr;
     _ptr_t<size_t> d_ptr;

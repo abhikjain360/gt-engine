@@ -1,0 +1,10 @@
+BasedOnStyle: Google
+IndentWidth: 4
+
+AccessModifierOffset: -4
+AlignConsecutiveAssignments: true
+AlignOperands: true
+AlignTrailingComments: true
+ColumnLimit: 90
+PointerAlignment: Left
+SpacesBeforeTrailingComments: 1
