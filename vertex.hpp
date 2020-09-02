@@ -19,7 +19,7 @@ public:
     constexpr vertex(const size_t id, const float weight) noexcept
         : m_id(id), wgt(weight), edges() {}
 
-    vertex(const size_t id, std::unique_ptr<joiner[]> ptr, const size_t size,
+    vertex(const size_t id, std::unique_ptr<edge[]> ptr, const size_t size,
            const float weight = 1)
         : m_id(id), wgt(weight), edges(std::move(ptr), size) {}
 
@@ -37,14 +37,16 @@ public:
     constexpr void set_weight(const float weight) { wgt = weight; }
     constexpr void set_id(const size_t id) { m_id = id; }
 
-    void join(const size_t dest, const float weight = 1) { edges.add({dest, weight}); }
+    void join(const size_t dest, const float weight = 1) {
+        edges.add({m_id, dest, weight});
+    }
     void unjoin(const size_t dest) {
-        edges.remove<size_t>(dest, [](const joiner& edge, const size_t& dest) {
+        edges.remove<size_t>(dest, [](const edge& edge, const size_t& dest) {
             return dest == edge.dest;
         });
     }
 
-    const joiner& operator[](const size_t index) {
+    const edge& operator[](const size_t index) {
         assert(index < edges.capacity());
         return edges[index];
     }
@@ -68,5 +70,5 @@ public:
 private:
     size_t m_id;
     float wgt;
-    edge_list<joiner> edges;
+    edge_list<edge> edges;
 };

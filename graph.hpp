@@ -20,8 +20,8 @@ public:
         for (size_t i = 0; i < size; ++i)
             for (size_t j = 0; j < V[i].degree(); ++j)
                 if (V[i][j].dest > V[i].id()) {
-                    E.add({V[i][j].weight, V[i].id(), V[i][j].dest});
-                    E.add({V[i][j].weight, V[i][j].dest, V[i].id()});
+                    E.add({V[i].id(), V[i][j].dest, V[i][j].weight});
+                    E.add({V[i][j].dest, V[i].id(), V[i][j].weight});
                 }
     }
 
