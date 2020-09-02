@@ -15,6 +15,8 @@ public:
     /* Constructors */
     constexpr cached_array() noexcept : ptr(), d_ptr(){};
 
+    cached_array(const size_t size) noexcept : ptr(size), d_ptr(size) {}
+
     cached_array(std::unique_ptr<T[]> p, const size_t size) noexcept
         : ptr(std::move(p), size), d_ptr(size) {
         assert(ptr != nullptr);

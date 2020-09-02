@@ -21,6 +21,18 @@ public:
     // UNTESTED
     resizeable_array(std::unique_ptr<T[]> p, const size_t size)
         : deg(size), cap(size), ptr(std::move(p)) {
+        assert(ptr != nullptr && size > 0);
+    }
+
+    // UNTESTED
+    /* Copy Contuctor */
+    resizeable_array(resizeable_array<T>& arr) : ptr(std::move(arr.ptr)) {
+        assert(ptr != nullptr);
+    }
+
+    // UNTESTED
+    /* Move Contuctor */
+    resizeable_array(resizeable_array<T>&& arr) : ptr(std::move(arr.ptr)) {
         assert(ptr != nullptr);
     }
 
@@ -50,7 +62,15 @@ public:
         ptr[deg++] = t;
     }
 
-    const T& operator[](const size_t index) const { return ptr[index]; }
+    T& operator[](const size_t index) noexcept {
+        assert(index < cap);
+        return ptr[index];
+    }
+
+    const T& operator[](const size_t index) const noexcept {
+        assert(index < cap);
+        return ptr[index];
+    }
 
     /* for assignments */
     resizeable_array<T>& operator=(resizeable_array<T>&& arr) {

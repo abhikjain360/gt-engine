@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <type_traits>
 #include <utility>
 
@@ -13,6 +14,8 @@ using edge_list = cached_array<T>;
 class vertex {
 public:
     /* Constructors */
+    constexpr vertex() : m_id(0), wgt(1), edges() {}
+
     constexpr vertex(const size_t id, const float weight) noexcept
         : m_id(id), wgt(weight), edges() {}
 
@@ -41,6 +44,11 @@ public:
         });
     }
 
+    const joiner& operator[](const size_t index) {
+        assert(index < edges.capacity());
+        return edges[index];
+    }
+
     vertex& operator=(vertex&& v) {
         m_id  = v.m_id;
         wgt   = v.wgt;
@@ -56,8 +64,6 @@ public:
 
         return *this;
     }
-
-    joiner operator[](const size_t index) { return edges[index]; }
 
 private:
     size_t m_id;
