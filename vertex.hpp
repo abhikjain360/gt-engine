@@ -57,6 +57,8 @@ public:
         return *this;
     }
 
+    joiner operator[](const size_t index) { return edges[index]; }
+
 private:
     size_t m_id;
     float wgt;

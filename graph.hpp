@@ -18,11 +18,16 @@ public:
     }
 
     graph(std::unique_ptr<vertex[]> p, const size_t size) : V(std::move(p), size) {
-        assert(p.get() != nullptr);
-
-		for (size_t i = 0; i < size; ++i) {
-		}
+        for (size_t i = 0; i < size; ++i) {
+            for (size_t j = 0; j < V[i].degree(); ++j) {
+                if (V[i][j].dest > i) {
+                    E.add({V[i][j].weight, i, V[i][j].dest});
+                }
+            }
+        }
     }
+
+    graph(std::unique_ptr<edge[]> edges, const size_t size) : E(std::move(edges), size) {}
 
     constexpr size_t edge_degree() const noexcept { return E.degree(); }
 
