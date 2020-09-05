@@ -17,7 +17,8 @@ public:
         }
     }
 
-    graph(std::unique_ptr<vertex[]> p, const size_t size) : V(std::move(p), size), E(size), v_loc(size + 1) {
+    graph(std::unique_ptr<vertex[]> p, const size_t size)
+        : V(std::move(p), size), E(size), v_loc(size + 1) {
         for (size_t i = 0; i < size; ++i)
             for (size_t j = 0; j < V[i].degree(); ++j) {
                 if (V[i][j].dest > V[i].id())
@@ -37,8 +38,41 @@ public:
         return V[vertex_id].degree();
     }
 
+    // UNTESED
+    template <typename Compare = bool(const edge&, const edge&)>
+    void sort_edges(Compare compare = [](const edge& e1, const edge& e2) -> bool {
+        return e1.src > e2.src;
+    }) {
+        E.sort(compare);
+    }
+
+    /* adding new elements */
+    void join(const vertex& v) {
+        V.add(v);
+        int i = 0;
+        while (i >= 0) E.add(v.next(i));
+    }
+
+    void join(const edge& e) {
+        E.add(e);
+        V[v_loc[e.src]].join(e);
+        V[v_loc[e.dest]].join(e);
+    }
+
 private:
     cached_array<vertex> V;
     cached_array<edge> E;
     index_keeper v_loc;
 };
+
+// UNTESED
+graph& operator+(graph& G, const edge& e) {
+    G.join(e);
+    return G;
+}
+
+// UNTESED
+graph& operator+(graph& G, const vertex& v) {
+    G.join(v);
+    return G;
+}
