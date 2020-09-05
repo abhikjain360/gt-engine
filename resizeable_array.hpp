@@ -7,6 +7,11 @@
 #include <optional>
 
 template <typename T>
+class cached_array;
+
+class index_keeper;
+
+template <typename T>
 class resizeable_array {
 public:
     /* Constructors */
@@ -18,27 +23,43 @@ public:
         assert(capacity > 0);
     }
 
-    // UNTESTED
     resizeable_array(std::unique_ptr<T[]> p, const size_t size)
         : deg(size), cap(size), ptr(std::move(p)) {
         assert(ptr != nullptr && size > 0);
     }
 
-    // UNTESTED
-    /* Copy Contuctor */
-    resizeable_array(resizeable_array<T>& arr) : ptr(std::move(arr.ptr)) {
-        assert(ptr != nullptr);
+    resizeable_array(resizeable_array<T>& arr) {
+        assert(arr.ptr != nullptr);
+
+        deg = arr.deg;
+
+        // cap is currently a random number as uninitalized, need to set 0
+        cap = 0;
+        this->resize(arr.cap);
+
+        for (size_t i = 0; i < arr.cap; ++i) ptr[i] = arr.ptr[i];
     }
 
-    // UNTESTED
     /* Move Contuctor */
-    resizeable_array(resizeable_array<T>&& arr) : ptr(std::move(arr.ptr)) {
+    resizeable_array(resizeable_array<T>&& arr)
+        : deg(arr.deg), cap(arr.cap), ptr(std::move(arr.ptr)) {
         assert(ptr != nullptr);
     }
 
     /* Getters */
     constexpr size_t degree() const noexcept { return deg; }
     constexpr size_t capacity() const noexcept { return cap; }
+
+    /* to manage only with pop & push */
+    void push(const T& t) {
+        if (deg >= cap) this->resize(cap + 1);
+        ptr[deg++] = t;
+    }
+
+    std::optional<T> pop() {
+        if (deg > 0) return ptr[--deg];
+        return {};
+    }
 
     /* editting the array values */
     void put(const size_t index, const T& t) {
@@ -51,20 +72,6 @@ public:
         assert(index < cap);
         ptr[index] = t;
         --deg;
-    }
-
-    std::optional<T> pop() {
-        if (deg > 0) return ptr[--deg];
-        return {};
-    }
-    void push(const T& t) {
-        if (deg >= cap) this->resize(cap + 1);
-        ptr[deg++] = t;
-    }
-
-    T& operator[](const size_t index) noexcept {
-        assert(index < cap);
-        return ptr[index];
     }
 
     const T& operator[](const size_t index) const noexcept {
@@ -144,4 +151,13 @@ private:
 
         return;
     }
+
+    T& operator[](const size_t index) noexcept {
+        assert(index < cap);
+        return ptr[index];
+    }
+
+    // these need access to
+    friend class cached_array<T>;
+    friend class index_keeper;
 };
