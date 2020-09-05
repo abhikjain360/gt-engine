@@ -97,7 +97,7 @@ public:
     bool operator!=(const T* p) { return p != ptr.get(); }
 
     template <typename Compare = bool(const T&, const T&)>
-    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a > b; }) {
         std::sort(ptr.get(), ptr.get() + cap, compare);
     }
 

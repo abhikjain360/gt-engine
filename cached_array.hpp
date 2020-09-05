@@ -46,18 +46,6 @@ public:
             ptr.put(ptr.degree(), t);
     }
 
-    template <typename Compare = bool(const T&, const T&)>
-    void remove(
-        const T& t,
-        Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
-        for (size_t i = 0; i < ptr.capacity(); ++i) {
-            if (compare(ptr[i], t)) {
-                ptr.remove(i);
-                d_ptr.push(i);
-            }
-        }
-    }
-
     template <typename S = T, typename Compare = bool(const T&, const S&)>
     void remove(
         const S& s,
@@ -95,10 +83,13 @@ public:
         return *this;
     }
 
+    // UNTESTED
     /* sort */
     template <typename Compare = bool(const T&, const T&)>
-    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+    void sort(Compare compare = [](const T& a, const T& b) -> bool { return a > b; }) {
         ptr.sort(compare);
+
+        // now that we have sorted all, we don't need cache
         for (size_t i = 0; i < d_ptr.capacity(); ++i) {
             d_ptr.remove(i);
         }
