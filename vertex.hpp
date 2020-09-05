@@ -37,14 +37,8 @@ public:
     constexpr void set_weight(const float weight) { wgt = weight; }
     constexpr void set_id(const size_t id) { m_id = id; }
 
-    void join(const size_t dest, const float weight = 1) {
-        edges.add({m_id, dest, weight});
-    }
-    void unjoin(const size_t dest) {
-        edges.remove<size_t>(dest, [](const edge& edge, const size_t& dest) {
-            return dest == edge.dest;
-        });
-    }
+    void join(const edge& e) { edges.add(e); }
+    void unjoin(const edge& e) { edges.remove(e); }
 
     const edge& operator[](const size_t index) {
         assert(index < edges.capacity());
@@ -65,6 +59,14 @@ public:
         edges = v.edges;
 
         return *this;
+    }
+
+    const edge next(int& i) const {
+        while (edges[i].src == 0 && i < edges.capacity()) ++i;
+        if (i == edges.capacity())
+            return -1;
+        else
+            return edges[i];
     }
 
 private:
