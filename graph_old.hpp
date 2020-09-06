@@ -47,8 +47,7 @@ public:
 
     // UNTESTED
     graph(std::unique_ptr<vertex[]> vertices, std::unique_ptr<edge[]> edges,
-          const size_t degree, const size_t listsize,
-          const bool integrate = true)
+          const size_t degree, const size_t listsize, const bool integrate = true)
         : _deg(degree),
           _v_cap(degree),
           _V(std::move(vertices)),
@@ -68,7 +67,7 @@ public:
     // assumes that if certain vertices that are smaller than max vertex id
     // mentioned are not connected by any of the edges, than those are isolated
     // vertices
-	// TODO: integrate with deleted cache
+    // TODO: integrate with deleted cache
     // UNTESTED
     graph(std::unique_ptr<edge[]> edges, const size_t listsize,
           const bool integrate = true)
@@ -200,8 +199,7 @@ private:
         // reallocation most thread safe
         auto v_temp = std::make_unique<vertex[]>(size);
 
-        if constexpr (std::is_nothrow_move_assignable_v<
-                          std::unique_ptr<vertex[]>>) {
+        if constexpr (std::is_nothrow_move_assignable_v<std::unique_ptr<vertex[]>>) {
             std::move(_V.get(), _V.get() + _v_cap, v_temp.get());
         } else {
             std::copy(_V.get(), _V.get() + _v_cap, v_temp.get());
@@ -220,8 +218,7 @@ private:
         // reallocation most thread safe
         auto temp = std::make_unique<edge[]>(size);
 
-        if constexpr (std::is_nothrow_move_assignable_v<
-                          std::unique_ptr<edge[]>>) {
+        if constexpr (std::is_nothrow_move_assignable_v<std::unique_ptr<edge[]>>) {
             std::move(_E.get(), _E.get() + _e_cap, temp.get());
         } else {
             std::copy(_E.get(), _E.get() + _e_cap, temp.get());
