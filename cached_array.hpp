@@ -47,9 +47,8 @@ public:
     }
 
     template <typename S = T, typename Compare = bool(const T&, const S&)>
-    void remove(
-        const S& s,
-        Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+    void remove(const S& s,
+                Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
         for (size_t i = 0; i < ptr.capacity(); ++i) {
             if (compare(ptr[i], s)) {
                 ptr.remove(i);

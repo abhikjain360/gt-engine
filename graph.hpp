@@ -28,9 +28,8 @@ public:
     }
 
     graph(std::unique_ptr<edge[]> p, const size_t size) : E(std::move(p), size) {
-        for(size_t i =0;i<size;i++)
-        {
-            V[E[i].src].join(E[i].dest) ; 
+        for (size_t i = 0; i < size; i++) {
+            V[E[i].src].join(E[i].dest);
         }
     }
 

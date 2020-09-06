@@ -13,9 +13,8 @@ int main() {
     V[9].join(1);
     graph G(std::move(V), 10);
     auto E = std::make_unique<edge[]>(10);
-    for(size_t i=0;i<7;i++)
-    {
-        E[i] = {i,2,1} ;
+    for (size_t i = 0; i < 7; i++) {
+        E[i] = {i, 2, 1};
     }
     return 0;
 }
