@@ -17,6 +17,5 @@ int main() {
     {
         E[i] = {i,2,1} ;
     }
-
     return 0;
 }
