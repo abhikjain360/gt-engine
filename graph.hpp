@@ -49,7 +49,7 @@ public:
     /* adding new elements */
     void join(const vertex& v) {
         V.add(v);
-        int i = 0;
+        size_t i = 0;
         while (i >= 0) E.add(v.next(i));
     }
 

@@ -61,7 +61,7 @@ public:
         return *this;
     }
 
-    const edge next(int& i) const {
+    const edge next(size_t& i) const {
         while (edges[i].src == 0 && i < edges.capacity()) ++i;
         if (i == edges.capacity())
             return -1;

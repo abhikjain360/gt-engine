@@ -4,15 +4,25 @@
 #include "graph.hpp"
 
 int main() {
-    auto V = std::make_unique<vertex[]>(10);
-    for (int i = 0; i < 9; ++i) {
-        V[i].set_id(i + 1);
-        V[i].join(i + 2);
-    }
-    V[9].set_id(10);
-    V[9].join(1);
+    // testing resizeable_array
+    resizeable_array<int> x;
+    resizeable_array<int> y(10);
+    std::unique_ptr<int[]> z = std::make_unique<int[]>(10);
 
-    graph G(std::move(V), 10);
+    for (int i = 20; i < 30; ++i) {
+        z[i - 20] = i;
+        y.push(i - 19);
+        y.push(i + 10);
+    }
+
+    resizeable_array t(std::move(z), 10);
+    t.push(13);
+    t.pop();
+
+    resizeable_array a(t);
+    resizeable_array b(std::move(t));
+
+	// testing cached_array
 
     return 0;
 }
