@@ -27,7 +27,11 @@ public:
             }
     }
 
-    graph(std::unique_ptr<edge[]> p, const size_t size) : E(std::move(p), size) {}
+    graph(std::unique_ptr<edge[]> p, const size_t size) : E(std::move(p), size) {
+        for (size_t i = 0; i < size; i++) {
+            V[E[i].src].join(E[i].dest);
+        }
+    }
 
     /* Getters */
     constexpr size_t edge_degree() const noexcept { return E.degree(); }
