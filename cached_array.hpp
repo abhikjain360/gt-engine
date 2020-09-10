@@ -23,9 +23,13 @@ public:
     }
 
     /* Copy Contuctor */
-    cached_array(cached_array<T>& arr)
-        : ptr(std::move(arr.ptr)), d_ptr(std::move(arr.d_ptr)) {
-        assert(ptr != nullptr && d_ptr != nullptr);
+    cached_array(const cached_array<T>& arr) {
+        assert(arr.ptr != nullptr && arr.d_ptr != nullptr);
+
+        this->empty();
+
+        for (size_t i = 0; i < arr.ptr.capacity(); ++i) ptr.push(arr.ptr[i]);
+        for (size_t i = 0; i < arr.d_ptr.capacity(); ++i) d_ptr.push(arr.d_ptr[i]);
     }
 
     /* Move Contuctor */
@@ -46,9 +50,15 @@ public:
             ptr.put(ptr.degree(), t);
     }
 
+    void empty() noexcept {
+        ptr.empty();
+        d_ptr.empty();
+    }
+
     template <typename S = T, typename Compare = bool(const T&, const S&)>
-    void remove(const S& s,
-                Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
+    void remove(
+        const S& s,
+        Compare compare = [](const T& a, const T& b) -> bool { return a == b; }) {
         for (size_t i = 0; i < ptr.capacity(); ++i) {
             if (compare(ptr[i], s)) {
                 ptr.remove(i);
@@ -57,32 +67,31 @@ public:
         }
     }
 
-    T& operator[](const size_t index) noexcept {
+    constexpr T& operator[](const size_t index) noexcept {
         assert(index < ptr.degree());
         return ptr[index];
     }
 
-    const T& operator[](const size_t index) const noexcept {
+    constexpr const T& operator[](const size_t index) const noexcept {
         assert(index < ptr.degree());
         return ptr[index];
     }
 
     /* for assignments */
-    cached_array<T>& operator=(cached_array<T>&& arr) {
+    constexpr cached_array<T>& operator=(cached_array<T>&& arr) {
         ptr   = std::move(arr.ptr);
         d_ptr = std::move(arr.d_ptr);
 
         return *this;
     }
 
-    cached_array<T>& operator=(const cached_array<T>& arr) {
+    constexpr cached_array<T>& operator=(const cached_array<T>& arr) {
         ptr   = arr.ptr;
         d_ptr = arr.d_ptr;
 
         return *this;
     }
 
-    // UNTESTED
     /* sort */
     template <typename Compare = bool(const T&, const T&)>
     void sort(Compare compare = [](const T& a, const T& b) -> bool { return a > b; }) {

@@ -79,6 +79,13 @@ public:
         return ptr[index];
     }
 
+    T& operator[](const size_t index) noexcept {
+        assert(index < cap);
+        return ptr[index];
+    }
+
+    void empty() noexcept { deg = 0; }
+
     /* for assignments */
     resizeable_array<T>& operator=(resizeable_array<T>&& arr) {
         // setting values of the LHS
@@ -97,11 +104,15 @@ public:
         return *this;
     }
 
-    bool operator==(const resizeable_array<T>& arr) { return arr.ptr.get() == ptr.get(); }
-    bool operator==(const T* p) { return p == ptr.get(); }
+    constexpr bool operator==(const resizeable_array<T>& arr) const noexcept {
+        return arr.ptr.get() == ptr.get();
+    }
+    constexpr bool operator==(const T* p) const noexcept { return p == ptr.get(); }
 
-    bool operator!=(const resizeable_array<T>& arr) { return arr.ptr.get() != ptr.get(); }
-    bool operator!=(const T* p) { return p != ptr.get(); }
+    constexpr bool operator!=(const resizeable_array<T>& arr) const noexcept {
+        return arr.ptr.get() != ptr.get();
+    }
+    constexpr bool operator!=(const T* p) const noexcept { return p != ptr.get(); }
 
     template <typename Compare = bool(const T&, const T&)>
     void sort(Compare compare = [](const T& a, const T& b) -> bool { return a > b; }) {
@@ -150,11 +161,6 @@ private:
         cap = size;
 
         return;
-    }
-
-    T& operator[](const size_t index) noexcept {
-        assert(index < cap);
-        return ptr[index];
     }
 
     // these need access to
