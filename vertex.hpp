@@ -16,7 +16,7 @@ public:
     /* Constructors */
     constexpr vertex() : m_id(0), wgt(1), edges() {}
 
-    constexpr vertex(const size_t id, const float weight) noexcept
+    constexpr vertex(const size_t id, const float weight = 1) noexcept
         : m_id(id), wgt(weight), edges() {}
 
     vertex(const size_t id, std::unique_ptr<edge[]> ptr, const size_t size,

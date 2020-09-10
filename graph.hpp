@@ -10,6 +10,7 @@
 class graph {
 public:
     /* Constructors */
+    // UNTESED
     graph(const size_t deg) : V(deg), E(), v_loc(deg + 1) {
         for (size_t i = 1; i <= deg; ++i) {
             V[i].set_id(i);
@@ -17,6 +18,7 @@ public:
         }
     }
 
+    // UNTESED
     graph(std::unique_ptr<vertex[]> p, const size_t size)
         : V(std::move(p), size), E(size), v_loc(size + 1) {
         for (size_t i = 0; i < size; ++i)
@@ -27,9 +29,22 @@ public:
             }
     }
 
+    // UNTESED
     graph(std::unique_ptr<edge[]> p, const size_t size) : E(std::move(p), size) {
+        size_t mad_id = 0;
         for (size_t i = 0; i < size; i++) {
-            V[E[i].src].join(E[i].dest);
+            if (E[i].src > mad_id) {
+                mad_id = E[i].src;
+                V.add(vertex(E[i].src));
+                v_loc.add(E[i].src, V.degree() - 1);
+            }
+            if (E[i].dest > mad_id) {
+                mad_id = E[i].dest;
+                V.add(vertex(E[i].dest));
+                v_loc.add(E[i].dest, V.degree() - 1);
+            }
+            V[E[i].src].join(E[i]);
+            V[E[i].dest].join(E[i]);
         }
     }
 
