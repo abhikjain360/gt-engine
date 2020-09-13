@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <type_traits>
 #include <utility>
 
 #include "cached_array.hpp"
@@ -37,15 +36,15 @@ public:
     constexpr void set_weight(const float weight) { wgt = weight; }
     constexpr void set_id(const size_t id) { m_id = id; }
 
-    void join(const edge& e) { edges.add(e); }
-    void unjoin(const edge& e) { edges.remove(e); }
+    constexpr void join(const edge& e) { edges.add(e); }
+    constexpr void unjoin(const edge& e) { edges.remove(e); }
 
-    const edge& operator[](const size_t index) {
+    constexpr const edge& operator[](const size_t index) const noexcept {
         assert(index < edges.capacity());
         return edges[index];
     }
 
-    vertex& operator=(vertex&& v) {
+    constexpr vertex& operator=(vertex&& v) {
         m_id  = v.m_id;
         wgt   = v.wgt;
         edges = std::move(v.edges);
@@ -53,7 +52,7 @@ public:
         return *this;
     }
 
-    vertex& operator=(const vertex& v) {
+    constexpr vertex& operator=(const vertex& v) {
         m_id  = v.m_id;
         wgt   = v.wgt;
         edges = v.edges;
@@ -61,16 +60,39 @@ public:
         return *this;
     }
 
-    const edge next(size_t& i) const {
+    constexpr const edge next(size_t& i) const {
         while (edges[i].src == 0 && i < edges.capacity()) ++i;
         if (i == edges.capacity())
             return -1;
         else
-            return edges[i];
+            return edges[i++];
+    }
+
+    // UNTESTED
+    void sort_edges() {
+        edges.sort([](const edge& a, const edge& b) -> bool {
+            if (a.src != b.src)
+                return a.src > b.src;
+            else
+                return a.dest > b.dest;
+        });
+
+        edges_sorted = true;
     }
 
 private:
     size_t m_id;
     float wgt;
     edge_list<edge> edges;
+    bool edges_sorted = false;
 };
+
+constexpr vertex& operator+(vertex& v, const edge& e) {
+    v.join(e);
+    return v;
+}
+
+constexpr vertex& operator-(vertex& v, const edge& e) {
+    v.unjoin(e);
+    return v;
+}
