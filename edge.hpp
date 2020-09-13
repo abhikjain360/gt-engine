@@ -15,5 +15,10 @@ struct edge {
     bool operator<=(const edge& e) const { return dest <= e.dest; }
     bool operator>=(const edge& e) const { return dest >= e.dest; }
     bool operator>(const edge& e) const { return dest > e.dest; }
-    bool operator==(const edge& e) const { return dest == e.dest; }
+    bool operator==(const edge& e) const {
+        return weight == e.weight && src == e.src && dest == e.dest;
+    }
+    bool operator!=(const edge& e) const {
+        return weight != e.weight || src != e.src || dest != e.dest;
+    }
 };
