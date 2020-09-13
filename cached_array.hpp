@@ -45,8 +45,10 @@ public:
     /* editting the array values */
     void add(const T& t) {
         if (d_ptr.degree() > 0)
+            // put in cache is available
             ptr.put(d_ptr.pop().value(), t);
         else
+            // if no cache left, means ptr packed with no empty spaces
             ptr.put(ptr.degree(), t);
     }
 
@@ -67,13 +69,11 @@ public:
         }
     }
 
-    constexpr T& operator[](const size_t index) noexcept {
-        assert(index < ptr.degree());
-        return ptr[index];
-    }
+    constexpr void remove(const size_t index, const T& t = 0) { ptr.remove(index, t); }
+
+    constexpr T& operator[](const size_t index) noexcept { return ptr[index]; }
 
     constexpr const T& operator[](const size_t index) const noexcept {
-        assert(index < ptr.degree());
         return ptr[index];
     }
 
@@ -98,9 +98,7 @@ public:
         ptr.sort(compare);
 
         // now that we have sorted all, we don't need cache
-        for (size_t i = 0; i < d_ptr.capacity(); ++i) {
-            d_ptr.remove(i);
-        }
+        d_ptr.empty();
     }
 
 private:

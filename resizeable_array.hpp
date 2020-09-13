@@ -28,6 +28,7 @@ public:
         assert(ptr != nullptr && size > 0);
     }
 
+	/* Copy Contuctor */
     resizeable_array(resizeable_array<T>& arr) {
         assert(arr.ptr != nullptr);
 
@@ -50,7 +51,8 @@ public:
     constexpr size_t degree() const noexcept { return deg; }
     constexpr size_t capacity() const noexcept { return cap; }
 
-    /* to manage only with pop & push */
+    // to manage only with pop & push:
+    // recommended if you want no empty spots in between
     void push(const T& t) {
         if (deg >= cap) this->resize(cap + 1);
         ptr[deg++] = t;
@@ -79,6 +81,7 @@ public:
         return ptr[index];
     }
 
+    // too useful to not not include, even if can cause security probs
     T& operator[](const size_t index) noexcept {
         assert(index < cap);
         return ptr[index];
@@ -104,6 +107,7 @@ public:
         return *this;
     }
 
+    /* Logical Operators */
     constexpr bool operator==(const resizeable_array<T>& arr) const noexcept {
         return arr.ptr.get() == ptr.get();
     }
@@ -123,7 +127,7 @@ private:
     size_t deg, cap;
     std::unique_ptr<T[]> ptr;
 
-    /* utility functon */
+    /* utility functons */
     constexpr size_t next2(size_t size) const noexcept {
         size_t lt = 2;
         while (lt <= size) lt <<= 1;
@@ -163,7 +167,7 @@ private:
         return;
     }
 
-    // these need access to
+    // these need access to some private things
     friend class cached_array<T>;
     friend class index_keeper;
 };
