@@ -62,20 +62,33 @@ public:
     }
 
     template <typename Compare = bool(const edge&, const edge&)>
-    void sort_edges(Compare compare = [](const edge& e1, const edge& e2) -> bool {
+    constexpr void sort_edges(Compare compare = [](const edge& e1,
+                                                   const edge& e2) -> bool {
         return e1.src > e2.src;
     }) {
         E.sort(compare);
     }
 
+    constexpr float** adjacency_matrix() const noexcept {
+        float* temp = new float[V.degree() * V.degree()];
+        float** arr = new float*[V.degree()];
+
+        for (size_t i = 0; i < V.degree(); ++i)
+            for (size_t j = 0; j < V.degree(); ++j) arr[i] = &temp[i * V.degree() + j];
+
+        for (size_t i = 0; i < E.degree(); ++i) arr[E[i].src][E[i].dest] += E[i].weight;
+
+        return arr;
+    }
+
     /* adding new elements */
-    void join(const edge& e) {
+    constexpr void join(const edge& e) {
         E.add(e);
         V[v_loc[e.src]].join(e);
         V[v_loc[e.dest]].join(e);
     }
 
-    void join(const vertex& v) {
+    constexpr void join(const vertex& v) {
         // if vertex already existing in V is added assertion fails
         // for those cases add edges of the vertex using other `join` overload
         assert(v.id() > V.degree());
@@ -86,13 +99,13 @@ public:
         }
     }
 
-    void unjoin(const edge& e) {
+    constexpr void unjoin(const edge& e) {
         E.remove(e);
         V[v_loc[e.src]].unjoin(e);
         V[v_loc[e.dest]].unjoin(e);
     }
 
-    void unjoin(const size_t vertex_id) {
+    constexpr void unjoin(const size_t vertex_id) {
         V.remove(vertex_id, [](const vertex& v1, const vertex& v2) -> bool {
             return v1.id() == v2.id();
         });
@@ -101,13 +114,13 @@ public:
             if (E[i].src == vertex_id || E[i].dest == vertex_id) E.remove(i);
     }
 
-    void unjoin(const vertex& v) { this->unjoin(v.id()); }
+    constexpr void unjoin(const vertex& v) { this->unjoin(v.id()); }
 
-    void operator+=(const edge& e) { this->join(e); }
-    void operator+=(const vertex& v) { this->join(v); }
-    void operator-=(const edge& e) { this->unjoin(e); }
-    void operator-=(const size_t vertex_id) { this->unjoin(vertex_id); }
-    void operator-=(const vertex& v) { this->unjoin(v); }
+    constexpr void operator+=(const edge& e) { this->join(e); }
+    constexpr void operator+=(const vertex& v) { this->join(v); }
+    constexpr void operator-=(const edge& e) { this->unjoin(e); }
+    constexpr void operator-=(const size_t vertex_id) { this->unjoin(vertex_id); }
+    constexpr void operator-=(const vertex& v) { this->unjoin(v); }
 
 private:
     cached_array<vertex> V;
@@ -140,4 +153,15 @@ graph operator-(graph G, const vertex& v) {
 graph operator-(graph G, const size_t vertex_id) {
     G.unjoin(vertex_id);
     return G;
+}
+
+constexpr std::ostream& operator<<(std::ostream& out, const graph& G) noexcept {
+    auto arr = G.adjacency_matrix();
+
+    for (size_t i = 0; i < G.degree(); ++i) {
+        for (size_t j = 0; j < G.degree(); ++j) out << arr[i][j] << ' ';
+        out << '\n';
+    }
+
+    return out;
 }

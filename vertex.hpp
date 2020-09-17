@@ -69,7 +69,7 @@ public:
     }
 
     // UNTESTED
-    void sort_edges() {
+    constexpr void sort_edges() {
         edges.sort([](const edge& a, const edge& b) -> bool {
             if (a.src != b.src)
                 return a.src > b.src;
