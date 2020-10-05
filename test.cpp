@@ -23,20 +23,26 @@
 #include <memory>
 #include <type_traits>
 
-struct test {
+struct test
+{
     int A;
     float B;
 };
 
 template <unsigned int N>
-struct dosomething {
+struct dosomething
+{
     std::unique_ptr<test[]> arr = std::make_unique<test[]>(N);
 
-    void increase_capacity(size_t size) {
+    void increase_capacity(size_t size)
+    {
         auto temp = std::make_unique<test[]>(size);
-        if constexpr (std::is_nothrow_move_assignable_v<test>) {
+        if constexpr (std::is_nothrow_move_assignable_v<test>)
+        {
             std::move(arr.get(), arr.get() + size, temp.get());
-        } else {
+        }
+        else
+        {
             std::copy(arr.get(), arr.get() + size, temp.get());
         }
 
@@ -44,7 +50,11 @@ struct dosomething {
     }
 };
 
-int main() { dosomething<3>().increase_capacity(3); }
+int
+main()
+{
+    dosomething<3>().increase_capacity(3);
+}
 
 /*
 Hi! I have a unique pointer of an array of struct, and I am writing a function

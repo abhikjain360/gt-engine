@@ -1,10 +1,41 @@
-BasedOnStyle: Google
+BasedOnStyle: Mozilla
 IndentWidth: 4
 
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: true
 AlignOperands: true
 AlignTrailingComments: true
-ColumnLimit: 90
+AllowShortLambdasOnASingleLine: All
+AllowShortBlocksOnASingleLine: Empty
+# enable this in clang 12
+#AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 80
 PointerAlignment: Left
+SpaceAfterTemplateKeyword: true
 SpacesBeforeTrailingComments: 1
+
+# Custom BraceWrapping
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: false
+    AfterClass: false
+    AfterControlStatement: Always
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    #AfterObjDeclaration: true
+    AfterStruct: true
+    AfterUnion: true
+    AfterExternBlock: false
+    BeforeCatch: false
+    BeforeElse: true
+    #BeforeLambdaBody: false
+    #BeforeWhile: false
+    IndentBraces: false
+    #SplitEmptyFunctions: false
+    SplitEmptyRecord: false
+    SplitEmptyNamespace: false

@@ -13,18 +13,38 @@ using edge_list = cached_array<T>;
 class vertex {
 public:
     /* Constructors */
-    constexpr vertex() : m_id(0), wgt(1), edges() {}
+    constexpr vertex()
+      : m_id(0)
+      , wgt(1)
+      , edges()
+    {}
 
     constexpr vertex(const size_t id, const float weight = 1) noexcept
-        : m_id(id), wgt(weight), edges() {}
+      : m_id(id)
+      , wgt(weight)
+      , edges()
+    {}
 
-    vertex(const size_t id, std::unique_ptr<edge[]> ptr, const size_t size,
+    vertex(const size_t id,
+           std::unique_ptr<edge[]> ptr,
+           const size_t size,
            const float weight = 1)
-        : m_id(id), wgt(weight), edges(std::move(ptr), size) {}
+      : m_id(id)
+      , wgt(weight)
+      , edges(std::move(ptr), size)
+    {}
 
     /* Copy Contuctor */
-    vertex(vertex& v) : m_id(v.m_id), wgt(v.wgt), edges(v.edges) {}
-    vertex(vertex&& v) : m_id(v.m_id), wgt(v.wgt), edges(std::move(v.edges)) {}
+    vertex(vertex& v)
+      : m_id(v.m_id)
+      , wgt(v.wgt)
+      , edges(v.edges)
+    {}
+    vertex(vertex&& v)
+      : m_id(v.m_id)
+      , wgt(v.wgt)
+      , edges(std::move(v.edges))
+    {}
 
     /* Getters */
     constexpr size_t id() const noexcept { return m_id; }
@@ -39,20 +59,25 @@ public:
     constexpr void join(const edge& e) { edges.add(e); }
     constexpr void unjoin(const edge& e) { edges.remove(e); }
 
-    constexpr const edge& operator[](const size_t index) const noexcept {
+    constexpr const edge& operator[](const size_t index) const noexcept
+    {
         assert(index < edges.capacity());
         return edges[index];
     }
 
-    constexpr vertex& operator=(vertex&& v) {
+    constexpr vertex& operator=(vertex&& v)
+    {
         m_id  = v.m_id;
         wgt   = v.wgt;
         edges = std::move(v.edges);
 
+        v.m_id = v.wgt = 0;
+
         return *this;
     }
 
-    constexpr vertex& operator=(const vertex& v) {
+    constexpr vertex& operator=(const vertex& v)
+    {
         m_id  = v.m_id;
         wgt   = v.wgt;
         edges = v.edges;
@@ -60,8 +85,10 @@ public:
         return *this;
     }
 
-    constexpr const edge next(size_t& i) const {
-        while (edges[i].src == 0 && i < edges.capacity()) ++i;
+    constexpr const edge next(size_t& i) const
+    {
+        while (edges[i].src == 0 && i < edges.capacity())
+            ++i;
         if (i == edges.capacity())
             return -1;
         else
@@ -69,7 +96,8 @@ public:
     }
 
     // UNTESTED
-    constexpr void sort_edges() {
+    constexpr void sort_edges()
+    {
         edges.sort([](const edge& a, const edge& b) -> bool {
             if (a.src != b.src)
                 return a.src > b.src;
@@ -87,12 +115,16 @@ private:
     bool edges_sorted = false;
 };
 
-constexpr vertex& operator+(vertex& v, const edge& e) {
+constexpr vertex&
+operator+(vertex& v, const edge& e)
+{
     v.join(e);
     return v;
 }
 
-constexpr vertex& operator-(vertex& v, const edge& e) {
+constexpr vertex&
+operator-(vertex& v, const edge& e)
+{
     v.unjoin(e);
     return v;
 }
