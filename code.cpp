@@ -34,11 +34,5 @@ main()
     g1.unjoin({ 1, 2, 1 });
     g1.unjoin({ 2, 3, 1 });
 
-    edge e2[2] = { { 6, 1, 1 }, { 6, 2, 1 } };
-    std::unique_ptr<edge[]> e1(e2);
-    vertex v1(6, std::move(e1), 2);
-    g1.join(v1);
-    g1.unjoin(v1.id());
-
     return 0;
 }

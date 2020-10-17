@@ -73,6 +73,28 @@ public:
       , v_loc(std::move(G.v_loc))
     {}
 
+    /* Assignment operators */
+    constexpr graph& operator=(const graph& G)
+    {
+        V        = G.V;
+        E        = G.E;
+        v_loc    = G.v_loc;
+        directed = G.directed;
+
+        return *this;
+    }
+
+    constexpr graph& operator=(graph&& G)
+    {
+        V          = std::move(G.V);
+        E          = std::move(G.E);
+        v_loc      = std::move(G.v_loc);
+        directed   = G.directed;
+        G.directed = false;
+
+        return *this;
+    }
+
     /* Getters */
     constexpr size_t edge_degree() const noexcept { return E.degree(); }
     constexpr size_t degree() const noexcept { return V.degree(); }
@@ -88,6 +110,11 @@ public:
         return V[v_loc[vertex_id]];
     }
 
+    constexpr const edge& get_edge(const size_t index) const
+    {
+        return E[index];
+    }
+
     template <typename Compare = bool(const edge&, const edge&)>
     constexpr void sort_edges(Compare compare = [](const edge& e1,
                                                    const edge& e2) -> bool {
@@ -97,7 +124,10 @@ public:
         E.sort(compare);
     }
 
-    constexpr float** adjacency_matrix() const noexcept
+    constexpr bool is_directed() const noexcept { return directed; }
+
+    // untested
+    float** adjacency_matrix() const noexcept
     {
         float* temp = new float[V.degree() * V.degree()];
         float** arr = new float*[V.degree()];

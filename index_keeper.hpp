@@ -19,6 +19,19 @@ public:
       : arr(std::move(idk.arr))
     {}
 
+    /* Assignment operators */
+    constexpr index_keeper& operator=(const index_keeper& other)
+    {
+        arr = other.arr;
+        return *this;
+    }
+
+    constexpr index_keeper& operator=(index_keeper&& other)
+    {
+        arr = std::move(other.arr);
+        return *this;
+    }
+
     constexpr size_t capacity() const noexcept { return arr.capacity(); }
     constexpr size_t degree() const noexcept { return arr.degree(); }
 

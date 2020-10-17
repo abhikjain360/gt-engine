@@ -65,6 +65,7 @@ public:
         return edges[index];
     }
 
+    /* Assignment operator */
     constexpr vertex& operator=(vertex&& v)
     {
         m_id  = v.m_id;
