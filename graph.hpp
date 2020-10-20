@@ -18,7 +18,7 @@ public:
         for (size_t i = 1; i <= deg; ++i)
         {
             V.add(i);
-            v_loc.add(i, i);
+            v_loc.add(i, i - 1);
         }
     }
 
@@ -192,7 +192,6 @@ public:
     }
     constexpr void operator-=(const vertex& v) { this->unjoin(v); }
 
-private:
     cached_array<vertex> V;
     cached_array<edge> E;
     index_keeper v_loc;
