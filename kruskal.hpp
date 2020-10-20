@@ -30,6 +30,7 @@ bool union_set(int a,int b,vector<int> &parent,vector<int> &depth)
 			swap(a,b) ;
 		}
 		parent[b] = a ;
+		depth[a] +=depth[b] ;
 		return true ;
 	}
 	return false ;
