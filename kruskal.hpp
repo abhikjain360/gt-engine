@@ -1,11 +1,8 @@
 #pragma once
 
-
 #include<vector>
-#include<iostream>
 #include <cstdlib>
 #include "graph.hpp"
-#define fast ios::sync_with_stdio(0); cin.tie(NULL); cout.tie(NULL)
 
 using namespace std;
 
