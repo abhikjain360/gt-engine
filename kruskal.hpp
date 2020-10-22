@@ -13,11 +13,10 @@ void makeSet(int v,vector<int> &parent)
 }
 int findSet(int v,vector<int> &parent)
 {
-	if(v==parent[v])
+	while(v!=parent[v])
 	{
-		return v ;
+		v = parent[v] ;
 	}
-	v = findSet(parent[v],parent) ;
 	return v ;
 }
 bool unionSet(int a,int b,vector<int> &parent,vector<int> &depth)
