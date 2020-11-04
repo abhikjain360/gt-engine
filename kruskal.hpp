@@ -1,61 +1,73 @@
 #pragma once
 
-#include<vector>
-#include <cstdlib>
 #include "graph.hpp"
+#include <cstdlib>
+#include <vector>
 
-using namespace std;
-
-bool compare(const edge &e1, const edge &e2) { return e1.weight < e2.weight; }
-void makeSet(int v,vector<int> &parent)
+bool
+compare(const edge& e1, const edge& e2)
 {
-	parent[v] = v ;
+    return e1.weight < e2.weight;
 }
-int findSet(int v,vector<int> &parent)
+
+void
+makeSet(int v, std::vector<int>& parent)
 {
-	while(v!=parent[v])
-	{
-		v = parent[v] ;
-	}
-	return v ;
+    parent[v] = v;
 }
-bool unionSet(int a,int b,vector<int> &parent,vector<int> &depth)
+
+int
+findSet(int v, std::vector<int>& parent)
 {
-	a = findSet(a,parent);
-	b = findSet(b,parent);
-	if(a!=b)
-	{
-		if (depth[a]<depth[b])
-		{
-			swap(a,b) ;
-		}
-		parent[b] = a ;
-		depth[a] +=depth[b] ;
-		return true ;
-	}
-	return false ;
-
+    while (v != parent[v])
+    {
+        v = parent[v];
+    }
+    return v;
 }
-graph KruskalsMinimumSpaningTree(graph &g1)
-{	
-	int n = g1.degree() ;
-	graph mst(n) ;
-	vector<int> parent;
-	parent.resize(n,-1);
-	vector<int> depth;
-	depth.resize(n,1) ;
-	for(int i = 0;i<n;i++)
-	{
-		makeSet(i,parent) ;
-	}
-	for (int i = 0; i < g1.edge_degree(); i++)
-	{
-		if(unionSet(g1.E[i].src,g1.E[i].dest,parent,depth))
-		{
-			mst.join({g1.E[i].src,g1.E[i].dest,g1.E[i].weight}) ;
-		}
-	}
 
+bool
+unionSet(int a, int b, std::vector<int>& parent, std::vector<int>& depth)
+{
+    a = findSet(a, parent);
+    b = findSet(b, parent);
+    if (a != b)
+    {
+        if (depth[a] < depth[b])
+        {
+            std::swap(a, b);
+        }
+        parent[b] = a;
+        depth[a] += depth[b];
+        return true;
+    }
+    return false;
+}
 
-	return mst;
+graph
+KruskalsMinimumSpaningTree(graph& g)
+{
+    int degree = g.degree();
+
+    graph mst(degree);
+
+    std::vector<int> parent;
+    parent.resize(degree, -1);
+
+    std::vector<int> depth;
+    depth.resize(degree, 1);
+
+    for (int i = 0; i < degree; i++)
+    {
+        makeSet(i, parent);
+    }
+    for (int i = 0; i < g.edge_degree(); i++)
+    {
+        if (unionSet(g.E[i].src, g.E[i].dest, parent, depth))
+        {
+            mst.join(g.E[i]);
+        }
+    }
+
+    return mst;
 }
