@@ -28,12 +28,19 @@ public:
       , v_loc(size + 1)
     {
         for (size_t i = 0; i < size; ++i)
-            for (size_t j = 0; j < V[i].degree(); ++j)
+        {
+            for (size_t j = 0; j < V[i].in_degree(); ++j)
             {
-                if (V[i][j].dest > V[i].id())
-                    E.add({ V[i].id(), V[i][j].dest, V[i][j].weight });
+                E.add({ V[i].in_edges[j].dest , V[i].id(), V[i].in_edges[j].weight });
                 v_loc.add(V[i].id(), i);
             }
+
+            for (size_t j = 0; j < V[i].out_degree(); ++j)
+            {
+                E.add({ V[i].out_edges[j].src, V[i].id(), V[i].out_edges[j].weight });
+                v_loc.add(V[i].id(), i);
+            }
+        }
     }
 
     graph(std::unique_ptr<edge[]> p, const size_t size)
@@ -150,19 +157,6 @@ public:
         V[v_loc[e.dest]].join(e);
     }
 
-    constexpr void join(const vertex& v)
-    {
-        // if vertex already existing in V is added assertion fails
-        // for those cases add edges of the vertex using other `join` overload
-        assert(v.id() > V.degree());
-        V.add(v);
-        size_t i = 0;
-        while (i < v.capacity())
-        {
-            E.add(v.next(i));
-        }
-    }
-
     constexpr void unjoin(const edge& e)
     {
         E.remove(e);
@@ -184,7 +178,6 @@ public:
     constexpr void unjoin(const vertex& v) { this->unjoin(v.id()); }
 
     constexpr void operator+=(const edge& e) { this->join(e); }
-    constexpr void operator+=(const vertex& v) { this->join(v); }
     constexpr void operator-=(const edge& e) { this->unjoin(e); }
     constexpr void operator-=(const size_t vertex_id)
     {
@@ -203,13 +196,6 @@ graph
 operator+(graph G, const edge& e)
 {
     G.join(e);
-    return G;
-}
-
-graph
-operator+(graph G, const vertex& v)
-{
-    G.join(v);
     return G;
 }
 
