@@ -17,13 +17,13 @@ makeSet(int v, std::vector<int>& parent)
 }
 
 int
-findSet(int v, std::vector<int>& parent)
+findSet(int v,vector<int> &parent)
 {
-    while (v != parent[v])
-    {
-        v = parent[v];
-    }
-    return v;
+	if (v ==parent[v])
+	{
+		return v ;
+	}
+	return parent[v]= findSet(parent[v],parent);
 }
 
 bool
