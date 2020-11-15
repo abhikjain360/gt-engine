@@ -53,7 +53,21 @@ public:
       , wgt(v.wgt)
       , in_edges(v.in_edges)
       , out_edges(v.out_edges)
-    {}
+    {
+        size_t size = v.in_edges.size();
+
+        for (size_t i = 0; i < size; ++i)
+        {
+            in_edges[i] = v.in_edges[i];
+
+            size = v.out_edges.size();
+        }
+
+        for (size_t i = 0; i < size; ++i)
+        {
+            out_edges[i] = v.out_edges[i];
+        }
+    }
     vertex(vertex&& v)
       : m_id(v.m_id)
       , wgt(v.wgt)
@@ -68,9 +82,9 @@ public:
     {
         return in_edges.capacity() + out_edges.capacity();
     }
-    constexpr size_t in_degree() const noexcept { return in_edges.size(); }
-    constexpr size_t out_degree() const noexcept { return out_edges.size(); }
-    constexpr size_t degree() const noexcept
+    size_t in_degree() const noexcept { return in_edges.size(); }
+    size_t out_degree() const noexcept { return out_edges.size(); }
+    size_t degree() const noexcept
     {
         return in_degree() + out_degree();
     }
@@ -119,10 +133,10 @@ public:
     /* Assignment operator */
     constexpr vertex& operator=(vertex&& v)
     {
-        m_id         = v.m_id;
-        wgt          = v.wgt;
-        in_edges     = std::move(v.in_edges);
-        out_edges    = std::move(v.out_edges);
+        m_id      = v.m_id;
+        wgt       = v.wgt;
+        in_edges  = std::move(v.in_edges);
+        out_edges = std::move(v.out_edges);
 
         v.m_id = v.wgt = 0;
 
@@ -131,10 +145,26 @@ public:
 
     constexpr vertex& operator=(const vertex& v)
     {
-        m_id         = v.m_id;
-        wgt          = v.wgt;
-        in_edges     = v.in_edges;
-        out_edges    = v.out_edges;
+        m_id = v.m_id;
+        wgt  = v.wgt;
+
+        size_t size = v.in_edges.size();
+
+        in_edges.reserve(size);
+
+        for (size_t i = 0; i < size; ++i)
+        {
+            in_edges[i] = v.in_edges[i];
+        }
+
+        size = v.out_edges.size();
+
+        out_edges.reserve(size);
+
+        for (size_t i = 0; i < size; ++i)
+        {
+            out_edges[i] = v.out_edges[i];
+        }
 
         return *this;
     }
@@ -170,7 +200,7 @@ operator+(vertex& v, const edge& e)
     return v;
 }
 
-constexpr vertex&
+inline vertex&
 operator-(vertex& v, const edge& e)
 {
     v.unjoin(e);

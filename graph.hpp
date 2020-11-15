@@ -60,13 +60,17 @@ public:
             if (E[i].src > max_id)
             {
                 max_id = E[i].src;
-                V.push_back(vertex(E[i].src));
             }
             if (E[i].dest > max_id)
             {
                 max_id = E[i].dest;
-                V.push_back(vertex(E[i].dest));
             }
+        }
+
+        V.resize(max_id);
+
+        for (size_t i = 0; i < size; ++i)
+        {
             V[E[i].src].join(E[i]);
             V[E[i].dest].join(E[i]);
         }
@@ -74,9 +78,22 @@ public:
 
     /* Copy Constructor */
     graph(const graph& G)
-      : V(G.V)
-      , E(G.E)
-    {}
+    {
+        size_t size = G.V.size();
+        V.resize(size);
+
+        for (int i = 0; i < size; ++i)
+        {
+            V[i] = G.V[i];
+        }
+
+        size = G.E.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            E.push_back(G.E[i]);
+        }
+    }
 
     /* Move Constructor */
     graph(graph&& G)
@@ -87,8 +104,20 @@ public:
     /* Assignment operators */
     constexpr graph& operator=(const graph& G)
     {
-        V = G.V;
-        E = G.E;
+        size_t size = G.V.size();
+        V.resize(size);
+
+        for (int i = 0; i < size; ++i)
+        {
+            V[i] = G.V[i];
+        }
+
+        size = G.E.size();
+
+        for (int i = 0; i < size; ++i)
+        {
+            E.push_back(G.E[i]);
+        }
 
         return *this;
     }
