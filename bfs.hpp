@@ -2,6 +2,7 @@
 
 #include "graph.hpp"
 #include <queue>
+#include <memory>
 
 std::shared_ptr<uint8_t[]>
 bfs(const graph& G, const size_t vertex_id)

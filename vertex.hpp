@@ -3,52 +3,46 @@
 #include <algorithm>
 #include <cassert>
 #include <utility>
+#include <vector>
 
-#include "cached_array.hpp"
 #include "edge.hpp"
-
-template <typename T>
-using edge_list = cached_array<T>;
 
 class graph;
 
 class vertex {
 public:
     /* Constructors */
-    constexpr vertex()
+    vertex()
       : m_id(0)
       , wgt(1)
       , in_edges()
       , out_edges()
-      , edges_sorted(false)
     {}
 
-    constexpr vertex(const size_t id, const float weight = 1) noexcept
+    vertex(const size_t id, const float weight = 1) noexcept
       : m_id(id)
       , wgt(weight)
       , in_edges()
       , out_edges()
-      , edges_sorted(false)
     {}
 
-    vertex(const size_t id,
-           std::unique_ptr<edge[]> ptr,
-           const size_t size,
-           const float weight = 1)
+    vertex(const size_t id, std::vector<edge> ptr, const float weight = 1)
       : m_id(id)
       , wgt(weight)
-      , edges_sorted(false)
     {
+        auto size = ptr.size();
+        in_edges.reserve(size);
+        out_edges.reserve(size);
         for (int i = 0; i < size; ++i)
         {
             if (ptr[i].src != m_id)
-                in_edges.add(ptr[i]);
+                in_edges.push_back(ptr[i]);
             else
             {
                 // failing this means that neither src nor dest is current
                 // vertex thus this edge can not be added to this vertex
                 assert(ptr[i].src == m_id);
-                out_edges.add(ptr[i]);
+                out_edges.push_back(ptr[i]);
             }
         }
     }
@@ -59,14 +53,12 @@ public:
       , wgt(v.wgt)
       , in_edges(v.in_edges)
       , out_edges(v.out_edges)
-      , edges_sorted(v.edges_sorted)
     {}
     vertex(vertex&& v)
       : m_id(v.m_id)
       , wgt(v.wgt)
       , in_edges(std::move(v.in_edges))
       , out_edges(std::move(v.out_edges))
-      , edges_sorted(v.edges_sorted)
     {}
 
     /* Getters */
@@ -76,9 +68,12 @@ public:
     {
         return in_edges.capacity() + out_edges.capacity();
     }
-    constexpr size_t in_degree() const noexcept { return in_edges.degree(); }
-    constexpr size_t out_degree() const noexcept { return out_edges.degree(); }
-    constexpr size_t degree() const noexcept { return in_degree() + out_degree(); }
+    constexpr size_t in_degree() const noexcept { return in_edges.size(); }
+    constexpr size_t out_degree() const noexcept { return out_edges.size(); }
+    constexpr size_t degree() const noexcept
+    {
+        return in_degree() + out_degree();
+    }
 
     /* Setters */
     constexpr void set_weight(const float weight) { wgt = weight; }
@@ -87,28 +82,37 @@ public:
     constexpr void join(const edge& e)
     {
         if (e.src != m_id)
-            in_edges.add(e);
+            in_edges.push_back(e);
         else
         {
             assert(e.src == m_id);
-            out_edges.add(e);
+            out_edges.push_back(e);
         }
-
-        edges_sorted = false;
     }
 
     constexpr void unjoin(const edge& e)
     {
-        if (e.src != m_id)
-            in_edges.remove(e, [](const edge& a, const edge& b) -> bool {
-                return a.src == b.src;
-            });
-        else
+        if (e.src == m_id)
         {
-            assert(e.src == m_id);
-            out_edges.remove(e, [](const edge& a, const edge& b) -> bool {
-                return a.dest == b.dest;
-            });
+            for (int i = 0; i < out_edges.size(); ++i)
+            {
+                if (out_edges[i].dest == e.dest)
+                {
+                    out_edges.erase(out_edges.begin() + i);
+                    break;
+                }
+            }
+        }
+        else if (e.dest == m_id)
+        {
+            for (int i = 0; i < in_edges.size(); ++i)
+            {
+                if (in_edges[i].src == e.src)
+                {
+                    in_edges.erase(in_edges.begin() + i);
+                    break;
+                }
+            }
         }
     }
 
@@ -119,7 +123,6 @@ public:
         wgt          = v.wgt;
         in_edges     = std::move(v.in_edges);
         out_edges    = std::move(v.out_edges);
-        edges_sorted = v.edges_sorted;
 
         v.m_id = v.wgt = 0;
 
@@ -132,27 +135,30 @@ public:
         wgt          = v.wgt;
         in_edges     = v.in_edges;
         out_edges    = v.out_edges;
-        edges_sorted = v.edges_sorted;
 
         return *this;
     }
 
     // UNTESTED
-    constexpr void sort_edges()
+    void sort_in_edges()
     {
-        in_edges.sort(
+        std::sort(
+          in_edges.begin(),
+          in_edges.end(),
           [](const edge& a, const edge& b) -> bool { return a.src > b.src; });
-        out_edges.sort(
+    }
+    void sort_out_edges()
+    {
+        std::sort(
+          out_edges.begin(),
+          out_edges.end(),
           [](const edge& a, const edge& b) -> bool { return a.dest > b.dest; });
-
-        edges_sorted = true;
     }
 
 private:
     size_t m_id;
     float wgt;
-    edge_list<edge> in_edges, out_edges;
-    bool edges_sorted = false;
+    std::vector<edge> in_edges, out_edges;
 
     friend class graph;
 };
