@@ -127,7 +127,7 @@ public:
         return e1.src > e2.src;
     })
     {
-        std::sort(compare);
+        std::sort(E.begin(), E.end(), compare);
     }
 
     // untested
